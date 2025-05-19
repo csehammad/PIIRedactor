@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "PII Redactor",
+  "version": "0.1",
+  "description": "Automatically detects and masks PII in clipboard and text fields before submission.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "clipboardRead",
+    "clipboardWrite"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "PII Redactor"
+  },
+  "options_page": "options.html"
+}
