@@ -21,7 +21,8 @@
     }
   ],
   "action": {
-    "default_title": "PII Redactor"
+    "default_title": "PII Redactor",
+    "default_popup": "popup.html"
   },
   "options_page": "options.html"
 }
