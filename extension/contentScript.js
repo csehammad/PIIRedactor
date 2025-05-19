@@ -1,9 +1,9 @@
-// Content script for PII Redactor
+// Content script for PII Redactor + Clipboard history
 
 // Helper to send text to background for masking
 function maskText(text) {
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage({type: 'mask', text}, (response) => {
+    chrome.runtime.sendMessage({ type: 'mask', text }, (response) => {
       resolve(response ? response.text : text);
     });
   });
@@ -15,10 +15,13 @@ function handleCopy(event) {
   if (!selection) return;
   const text = selection.toString();
   if (!text) return;
+
   event.preventDefault();
   maskText(text).then((masked) => {
+    // Put masked text on the clipboard
     event.clipboardData.setData('text/plain', masked);
-    chrome.runtime.sendMessage({type: 'addClipboard', text: masked});
+    // Record in history
+    chrome.runtime.sendMessage({ type: 'addClipboard', text: masked });
   });
 }
 
@@ -28,24 +31,27 @@ document.addEventListener('copy', handleCopy, true);
 function handlePaste(event) {
   const clipboardData = event.clipboardData.getData('text/plain');
   if (!clipboardData) return;
+
   event.preventDefault();
   maskText(clipboardData).then((masked) => {
+    // Insert masked text into the target
     if (event.target.value !== undefined) {
       event.target.value = masked;
     } else {
       event.target.innerText = masked;
     }
-    chrome.runtime.sendMessage({type: 'addClipboard', text: masked});
+    // Record in history
+    chrome.runtime.sendMessage({ type: 'addClipboard', text: masked });
   });
 }
 
 document.addEventListener('paste', handlePaste, true);
 
-// Sanitize text in input fields
+// Sanitize text in input fields on-the-fly
 async function sanitizeField(element) {
   if (!element) return;
-  const value = element.value || element.innerText;
-  const masked = await maskText(value);
+  const current = element.value ?? element.innerText;
+  const masked  = await maskText(current);
   if (element.value !== undefined) {
     element.value = masked;
   } else {
@@ -54,19 +60,19 @@ async function sanitizeField(element) {
 }
 
 function handleInput(event) {
-  const element = event.target;
-  if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA' || element.isContentEditable) {
-    sanitizeField(element);
+  const el = event.target;
+  if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable) {
+    sanitizeField(el);
   }
 }
 
 document.addEventListener('input', handleInput, true);
 
-// Intercept form submissions to ensure fields are sanitized
+// Ensure all fields are sanitized on form submission
 function handleSubmit(event) {
   const form = event.target;
-  const elements = form.querySelectorAll('input, textarea, [contenteditable="true"]');
-  elements.forEach((el) => sanitizeField(el));
+  const els  = form.querySelectorAll('input, textarea, [contenteditable="true"]');
+  els.forEach(sanitizeField);
 }
 
 document.addEventListener('submit', handleSubmit, true);
