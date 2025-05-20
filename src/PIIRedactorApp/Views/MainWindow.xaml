@@ -5,6 +5,7 @@
     <Grid>
         <StackPanel>
             <Button Content="Settings" Click="Settings_Click" HorizontalAlignment="Right" Width="75" Margin="0,5"/>
+            <TextBox Name="SearchBox" Margin="0,0,0,5" PlaceholderText="Search" TextChanged="SearchBox_TextChanged"/>
             <ListBox Name="ClipboardList" Height="250"/>
         </StackPanel>
     </Grid>
