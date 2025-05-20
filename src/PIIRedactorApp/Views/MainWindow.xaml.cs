@@ -5,6 +5,7 @@ using PIIRedactorApp.Models;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Windows.Controls;
 
 namespace PIIRedactorApp.Views
 {
@@ -87,6 +88,29 @@ namespace PIIRedactorApp.Views
                 clipboardService.Config = win.Config;
                 ConfigManager.Save(win.Config);
             }
+        }
+
+        private void DeleteItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string item)
+            {
+                ClipboardHistory.Remove(item);
+                ApplyFilter(SearchBox.Text);
+            }
+        }
+
+        private void CopyItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string item)
+            {
+                System.Windows.Clipboard.SetText(item);
+            }
+        }
+
+        private void ClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            ClipboardHistory.Clear();
+            ApplyFilter(string.Empty);
         }
     }
 }
