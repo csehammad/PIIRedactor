@@ -5,7 +5,7 @@ using Microsoft.ML;
 using PIIRedactorApp.Models;
 using System.Windows.Threading;
 
-namespace PIIRedactorApp
+namespace PIIRedactorApp.Services
 {
     public class ClipboardService
     {
