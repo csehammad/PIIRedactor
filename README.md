@@ -3,6 +3,9 @@
 This repository contains a Windows 10 desktop application that monitors the clipboard and removes sensitive information. The application includes:
 
 - Clipboard manager with history
+- Action buttons for each entry to copy or delete
+- Clear-all option to quickly remove history
+- Alternating colors for easier reading of history items
 - Configurable PII detection settings
 - Enterprise templates for common policies
 - Offline ML model integration for PII detection

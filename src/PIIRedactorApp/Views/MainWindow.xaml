@@ -4,9 +4,35 @@
         Title="PII Redactor Clipboard Manager" Height="350" Width="525">
     <Grid>
         <StackPanel>
-            <Button Content="Settings" Click="Settings_Click" HorizontalAlignment="Right" Width="75" Margin="0,5"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Settings" Click="Settings_Click" Width="75" Margin="0,5"/>
+                <Button Content="Clear All" Click="ClearAll_Click" Width="75" Margin="5,5,0,5"/>
+            </StackPanel>
             <TextBox Name="SearchBox" Margin="0,0,0,5" PlaceholderText="Search" TextChanged="SearchBox_TextChanged"/>
-            <ListBox Name="ClipboardList" Height="250"/>
+            <ListBox Name="ClipboardList" Height="250" AlternationCount="2">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Padding" Value="2"/>
+                        <Style.Triggers>
+                            <Trigger Property="AlternationIndex" Value="1">
+                                <Setter Property="Background" Value="#f5f5f5"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <TextBlock Text="{Binding}" Width="300" TextTrimming="CharacterEllipsis" DockPanel.Dock="Left"/>
+                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                <Button Content="Copy" Margin="5,0" Tag="{Binding}" Click="CopyItem_Click"/>
+                                <Button Content="Delete" Margin="5,0" Tag="{Binding}" Click="DeleteItem_Click"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
     </Grid>
 </Window>
