@@ -5,7 +5,21 @@
     <Grid>
         <StackPanel>
             <Button Content="Settings" Click="Settings_Click" HorizontalAlignment="Right" Width="75" Margin="0,5"/>
-            <ListBox Name="ClipboardList" Height="250"/>
+            <ListBox Name="ClipboardList"
+                     ItemsSource="{Binding ClipboardHistory}"
+                     Height="250"
+                     ScrollViewer.CanContentScroll="True"
+                     VirtualizingPanel.IsVirtualizing="True"
+                     VirtualizingPanel.VirtualizationMode="Recycling">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Text}"/>
+                            <TextBlock Text="{Binding Timestamp}" FontSize="10" Foreground="Gray"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </StackPanel>
     </Grid>
 </Window>
