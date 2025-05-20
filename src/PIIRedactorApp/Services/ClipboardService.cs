@@ -1,9 +1,10 @@
 using System;
 using System.Text.RegularExpressions;
-using System.Windows;
 using Microsoft.ML;
 using PIIRedactorApp.Models;
 using System.Windows.Threading;
+using System.IO;
+using PIIRedactorApp.Services;
 
 namespace PIIRedactorApp
 {
@@ -12,14 +13,18 @@ namespace PIIRedactorApp
         private string lastText = string.Empty;
         private readonly DispatcherTimer timer;
         private ITransformer? model;
+        private readonly IClipboardProvider clipboard;
         public RedactorConfig Config { get; set; }
 
         public event EventHandler<string>? ClipboardChanged;
 
         public ClipboardService()
         {
-            Config = TemplateProvider.LoadTemplates()[0];
-            timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+            Config = ConfigManager.Load();
+            clipboard = Environment.OSVersion.Platform == PlatformID.Win32NT
+                ? new WindowsClipboardProvider() as IClipboardProvider
+                : new DummyClipboardProvider();
+            timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1000) };
             timer.Tick += Timer_Tick;
             timer.Start();
             LoadModel();
@@ -32,22 +37,24 @@ namespace PIIRedactorApp
                 var ml = new MLContext();
                 model = ml.Model.Load("models/PIIModel.zip", out var _);
             }
-            catch
+            catch (Exception ex)
             {
                 model = null;
+                Logger.Log($"Failed to load model: {ex.Message}");
             }
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
         {
-            if (Clipboard.ContainsText())
+            if (clipboard.ContainsText())
             {
-                var text = Clipboard.GetText();
+                var text = clipboard.GetText();
                 if (text != lastText)
                 {
                     lastText = Sanitize(text);
-                    Clipboard.SetText(lastText);
+                    clipboard.SetText(lastText);
                     ClipboardChanged?.Invoke(this, lastText);
+                    Logger.Log("Clipboard sanitized");
                 }
             }
         }
@@ -61,9 +68,19 @@ namespace PIIRedactorApp
             }
             if (Config.UseMLModel && model != null)
             {
-                // TODO: integrate ML model prediction
+                result = PredictSensitive(result);
+            }
+            else if (Config.UseMLModel && model == null)
+            {
+                Logger.Log("ML model not loaded; skipping ML sanitization.");
             }
             return result;
+        }
+
+        private string PredictSensitive(string text)
+        {
+            // TODO: integrate ML model prediction when model schema is known
+            return text;
         }
     }
 }

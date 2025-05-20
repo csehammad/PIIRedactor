@@ -9,3 +9,23 @@ This repository contains a Windows 10 desktop application that monitors the clip
 - Basic installer using Inno Setup
 
 See `src/PIIRedactorApp` for the WPF application.
+
+## Building
+
+```bash
+dotnet build
+```
+
+## Running Tests
+
+```bash
+dotnet test
+```
+
+## Custom Patterns
+
+Edit `config.json` to add or modify regex patterns used for redaction. You can also select predefined templates in the Settings window.
+
+## Cross Platform
+
+A fallback clipboard provider is included for non-Windows systems, but only basic functionality is available.
